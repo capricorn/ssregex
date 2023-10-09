@@ -44,6 +44,39 @@ indirect enum Expression: CustomStringConvertible {
     case union(left: Expression, right: Expression)
     case concat([Expression])
     
+    enum Rewrite {
+        static func removeExtraneousConcat(_ expr: Expression) -> Expression {
+            switch expr {
+            case .concat(let array):
+                if array.count == 1 {
+                    return array[0]
+                }
+            default: 
+                break
+            }
+            
+            return expr
+        }
+        
+        static func collapseQuantifiers(_ expr: Expression) -> Expression {
+            switch expr {
+            case .quantifier(let quantifier, let subexpr):
+                switch subexpr {
+                case .quantifier(let subquantifier, _):
+                    if quantifier == subquantifier {
+                        return subexpr
+                    }
+                default:
+                    break
+                }
+            default:
+                break
+            }
+            
+            return expr
+        }
+    }
+    
     static func rewrite(_ expr: Expression, rewriter: (Expression) -> Expression) -> Expression {
         // Idea is: rewrite will return the transformed version of the node
         // Problem is: if rewriter is a no-op, then what
