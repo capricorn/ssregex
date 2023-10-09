@@ -37,8 +37,8 @@ extension Array where Element == String {
     }
 }
 
-// TODO: Implement pretty print
-indirect enum Expression {
+// TODO: **Implement pretty print**
+indirect enum Expression: CustomStringConvertible {
     case string(String)
     case quantifier(operator: Lex.Token.Quantifier, Expression)
     case union(left: Expression, right: Expression)
@@ -104,6 +104,19 @@ indirect enum Expression {
         let tree = Parser.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
         print("Lex tree: \(tree)")
         return parseTree(tree)
+    }
+    
+    var description: String {
+        switch self {
+        case .string(let string):
+            return string
+        case .quantifier(let quantifier, let expression):
+            return "(\(expression))\(quantifier.rawValue)"
+        case .union(let left, let right):
+            return "(\(left)|\(right))"
+        case .concat(let array):
+            return array.map({$0.description}).joined(separator: "")
+        }
     }
 }
 
