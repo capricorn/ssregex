@@ -44,6 +44,26 @@ indirect enum Expression: CustomStringConvertible {
     case union(left: Expression, right: Expression)
     case concat([Expression])
     
+    static func rewrite(_ expr: Expression, rewriter: (Expression) -> Expression) -> Expression {
+        // Idea is: rewrite will return the transformed version of the node
+        // Problem is: if rewriter is a no-op, then what
+        let transformedExpr = rewriter(expr)
+        
+        // Take the rewritten version, go from there
+        switch transformedExpr {
+        case .quantifier(let quantifier, let expression):
+            return .quantifier(operator: quantifier, rewrite(expression, rewriter: rewriter))
+        case .union(let left, let right):
+            return .union(left: rewrite(left, rewriter: rewriter), right: rewrite(right, rewriter: rewriter))
+        case .concat(let array):
+            return .concat(array.map({rewrite($0, rewriter: rewriter)}))
+        default:
+            break
+        }
+        
+        return transformedExpr
+    }
+    
     private static func parseTree(_ tree: Parser.Paren) -> Expression {
         var expressions: [Expression] = []
         
