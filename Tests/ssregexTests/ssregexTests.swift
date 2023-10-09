@@ -34,20 +34,18 @@ final class ssregexTests: XCTestCase {
         let lex = try Lex.lex(#"((abc)*)*"#)
         let ast = Expression.parse(lex)
         
-        print("AST original: \(ast)")
-        
-        let astRewrite = Expression.rewrite(ast, rewriter: Expression.Rewrite.removeExtraneousConcat)
+        let astRewrite = ast.rewrite(.removeExtraneousConcat)
         
         // TODO: Validate nodes are exactly the same
-        XCTAssert(ast.description == #"((abc)*)*"#, ast.description)
+        XCTAssert(astRewrite.description == #"((abc)*)*"#, ast.description)
     }
     
     func testTreeRewriteCollapseQuantifier() throws {
         let lex = try Lex.lex(#"((abc)*)*"#)
-        var ast = Expression.parse(lex)
-        ast = Expression.rewrite(ast, rewriter: Expression.Rewrite.removeExtraneousConcat)
-        
-        let astRewrite = Expression.rewrite(ast, rewriter: Expression.Rewrite.collapseQuantifiers)
+        let ast = Expression.parse(lex)
+        let astRewrite = ast
+            .rewrite(.removeExtraneousConcat)
+            .rewrite(.collapseQuantifiers)
         
         XCTAssert(astRewrite.description == #"(abc)*"#, astRewrite.description)
     }

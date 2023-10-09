@@ -45,6 +45,9 @@ indirect enum Expression: CustomStringConvertible {
     case concat([Expression])
     
     enum Rewrite {
+        case removeExtraneousConcat
+        case collapseQuantifiers
+        
         static func removeExtraneousConcat(_ expr: Expression) -> Expression {
             switch expr {
             case .concat(let array):
@@ -75,6 +78,22 @@ indirect enum Expression: CustomStringConvertible {
             
             return expr
         }
+    }
+    
+    // Can do polymorphism to have enum cases of defined transforms, use dot notation to advantage.
+    func rewrite(_ rewriter: (Expression) -> Expression) -> Expression {
+        return Expression.rewrite(self, rewriter: rewriter)
+    }
+    
+    func rewrite(_ rewriter: Rewrite) -> Expression {
+        let transform: (Expression) -> Expression = switch rewriter {
+        case .removeExtraneousConcat:
+            Expression.Rewrite.removeExtraneousConcat
+        case .collapseQuantifiers:
+            Expression.Rewrite.collapseQuantifiers
+        }
+        
+        return rewrite(transform)
     }
     
     static func rewrite(_ expr: Expression, rewriter: (Expression) -> Expression) -> Expression {
