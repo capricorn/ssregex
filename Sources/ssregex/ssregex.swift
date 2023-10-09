@@ -37,6 +37,77 @@ extension Array where Element == String {
     }
 }
 
+// TODO: Implement pretty print
+indirect enum Expression {
+    case string(String)
+    case quantifier(operator: Lex.Token.Quantifier, Expression)
+    case union(left: Expression, right: Expression)
+    case concat([Expression])
+    
+    private static func parseTree(_ tree: Parser.Paren) -> Expression {
+        var expressions: [Expression] = []
+        
+        // TODO: Implement conversion of Lex.Token -> Expression (computed var)
+        // Then, write test.
+        switch tree {
+        case .token(let token):
+            // The only tokens reachable here are primitives (leaves)
+            switch token {
+            case .string(let value):
+                return .string(value)
+            case .specialChar(let special):
+                // TODO: Worth returning special? Can reasonably detect with leading '\'.
+                return .string(special.rawValue)
+            default:
+                assertionFailure("Cannot handle non-primitive token case: \(tree)")
+                break
+            }
+            // TODO: Appropriate token conversion
+            //expressions.append([.concat(token)])
+            break
+        case .paren(let array):
+            // TODO: Iterate entire array (i.e. concat case)
+            var array = array
+            
+            while array.isEmpty == false {
+                if array.count >= 3, case .token(.union) = array[1] {
+                    // Expr | Expr
+                    expressions.append(.union(left: parseTree(array[0]), right: parseTree(array[2])))
+                    array = Array(array[3...])
+                } else if array.count >= 2, case .token(let token) = array[1], case .quantifier(let quantifier) = token {
+                    // (Expr)Quantifier e.g. (abc)*
+                    expressions.append(.quantifier(operator: quantifier, parseTree(array[0])))
+                    array = Array(array[2...])
+                } else {
+                    expressions.append(parseTree(array[0]))
+                    array = Array(array[1...])
+                }
+            }
+            
+            /*
+            for node in array {
+                switch node {
+                case .token(let token):
+                    // TODO: Appropriate token conversion
+                    break
+                case .paren(_):
+                    expressions.append(parseTree(node))
+                }
+            }
+            */
+        }
+
+        return .concat(expressions)
+    }
+    
+    static func parse(_ tokens: [Lex.Token]) -> Expression {
+        let tree = Parser.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
+        print("Lex tree: \(tree)")
+        return parseTree(tree)
+    }
+}
+
+
 enum Lex {
     struct TokenError: Error {}
     
@@ -89,7 +160,6 @@ enum Lex {
             }
             return false
         }
-        
     }
     
     static func lex(_ input: String) throws -> [Token] {
@@ -159,6 +229,50 @@ protocol Partial {
 }
 
 enum Parser {
+    // TODO: Return this from parenthesize
+    indirect enum Paren {
+        case token(Lex.Token)
+        case paren([Paren])
+        
+        
+        private static func parenthesizeRec(_ tokens: [Lex.Token]) -> (parens: Paren, remainder: [Lex.Token]) {
+            var container: [Paren] = []
+            var tokens = tokens
+            var remainder: [Lex.Token] = []
+            
+            tokenLoop:
+            while (tokens.isEmpty == false) {
+                let token = tokens[0]
+                
+                if case let .paren(type, _) = token {
+                    switch type {
+                    case .left:
+                        let tree = parenthesizeRec(Array(tokens[tokens.index(0, offsetBy: 1)...]))
+                        container.append(tree.parens)
+                        tokens = tree.remainder
+                    case .right:
+                        // Terminating case typically (closing paren)
+                        tokens = Array(tokens[tokens.index(0, offsetBy: 1)...])
+                        remainder = tokens
+                        break tokenLoop
+                    }
+                } else {
+                    // base case
+                    container.append(.token(token))
+                    tokens = Array(tokens[tokens.index(0, offsetBy: 1)...])
+                }
+            }
+            
+            return (parens: .paren(container), remainder: remainder)
+        }
+        
+        static func parenthesize(_ tokens: [Lex.Token]) -> Paren {
+            // TODO: Take definition below, modify as necessary.
+            //return .token(.string(value: ""))
+            return parenthesizeRec(tokens).parens
+        }
+    }
+    
     static func parenthesize(_ tokens: [Lex.Token]) -> (parens: [Any], remainder: [Lex.Token]) {
         var container: [Any] = []
         var tokens = tokens
