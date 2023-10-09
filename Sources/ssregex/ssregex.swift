@@ -192,10 +192,16 @@ enum Lex {
         while (index < input.count) {
             let char = input[input.index(input.startIndex, offsetBy: index)..<input.index(input.startIndex, offsetBy: index+1)]
             
-            if case let .string(startIndex) = state, alphanumeric(String(char)) == false {
-                let str = input[input.index(input.startIndex, offsetBy: startIndex)..<input.index(input.startIndex, offsetBy: index)]
-                tokens.append(.string(value: String(str)))
-                state = .none
+            if case let .string(startIndex) = state {
+                if alphanumeric(String(char)) == false {
+                    let str = input[input.index(input.startIndex, offsetBy: startIndex)..<input.index(input.startIndex, offsetBy: index)]
+                    tokens.append(.string(value: String(str)))
+                    state = .none
+                } else if index == input.count-1 {
+                    let str = input[input.index(input.startIndex, offsetBy: startIndex)...]
+                    tokens.append(.string(value: String(str)))
+                    state = .none
+                }
             }
                 
             switch char {
