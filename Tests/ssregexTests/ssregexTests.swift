@@ -15,4 +15,11 @@ final class ssregexTests: XCTestCase {
         
         XCTAssert(ast.description == #"(abc|xyz)"#, ast.description)
     }
+    
+    func testUnionQuantifierParse() throws {
+        let lex = try Lex.lex(#"(abc|xyz)*"#)
+        let ast = Expression.parse(lex)
+        
+        XCTAssert(ast.description == #"((abc|xyz))*"#, ast.description)
+    }
 }
