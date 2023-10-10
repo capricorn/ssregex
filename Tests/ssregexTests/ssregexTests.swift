@@ -61,4 +61,14 @@ final class ssregexTests: XCTestCase {
         
         XCTAssert(partial.description == "(asdf|(asd|(as|a)))", "original: \(reExpr.description) partial: \(partial)")
     }
+    
+    func testStringQuantifierPartialExpression() throws {
+        let reExpr =
+            Expression
+                .parse(try Lex.lex("(asdf)*"))
+                .rewrite(.removeExtraneousConcat)
+        
+        let partial = reExpr.partial
+        XCTAssert(partial.description == "(asdf)*((asdf|(asd|(as|a))))?", "original: \(reExpr.description) partial: \(partial)")
+    }
 }

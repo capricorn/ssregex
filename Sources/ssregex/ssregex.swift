@@ -97,9 +97,14 @@ indirect enum Expression: CustomStringConvertible {
             // Lex transformed string, pass as new expression.
             let partialLex = try! Lex.lex(partial)
             return Expression.parse(partialLex)
-            /*
-        case .quantifier(let `operator`, let expression):
-            <#code#>
+        case .quantifier(let quantifier, let subexpr):
+            // TODO: Assumption is * quantifier; handle other cases
+            switch subexpr {
+            case .string(_):
+                return .concat([self, .quantifier(operator: .zeroOrOne, subexpr.partial)])
+            default: break
+            }
+        /*
         case .union(let left, let right):
             <#code#>
         case .concat(let array):
