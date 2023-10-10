@@ -102,6 +102,9 @@ indirect enum Expression: CustomStringConvertible {
             switch subexpr {
             case .string(_):
                 return .concat([self, .quantifier(operator: .zeroOrOne, subexpr.partial)])
+            case .union(let left, let right):
+                // (A|B)* -> (A|B)*(p(A)|p(B))?
+                return .concat([self, .quantifier(operator: .zeroOrOne, .union(left: left.partial, right: right.partial))])
             default: break
             }
         /*

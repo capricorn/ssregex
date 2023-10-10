@@ -71,4 +71,14 @@ final class ssregexTests: XCTestCase {
         let partial = reExpr.partial
         XCTAssert(partial.description == "(asdf)*((asdf|(asd|(as|a))))?", "original: \(reExpr.description) partial: \(partial)")
     }
+    
+    func testUnionQuantifierPartialExpression() throws {
+        let reExpr =
+            Expression
+                .parse(try Lex.lex("(abc|xyz)*"))
+                .rewrite(.removeExtraneousConcat)
+    
+        let partial = reExpr.partial
+        XCTAssert(partial.description == "((abc|xyz))*(((abc|(ab|a))|(xyz|(xy|x))))?", "original: \(reExpr.description) partial: \(partial)")
+    }
 }
