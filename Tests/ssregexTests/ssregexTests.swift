@@ -10,10 +10,11 @@ final class ssregexTests: XCTestCase {
     }
     
     func testUnionParse() throws {
-        let lex = try Lex.lex(#"abc|xyz"#)
-        let ast = Expression.parse(lex)
+        let lex = try Lex.lex(#"abc|xyz|ijk"#)
+        let ast = Expression
+            .parse(lex)
         
-        XCTAssert(ast.description == #"(abc|xyz)"#, ast.description)
+        XCTAssert(ast.description == #"(abc|(xyz|ijk))"#, ast.description)
     }
     
     func testUnionQuantifierParse() throws {
@@ -48,5 +49,16 @@ final class ssregexTests: XCTestCase {
             .rewrite(.collapseQuantifiers)
         
         XCTAssert(astRewrite.description == #"(abc)*"#, astRewrite.description)
+    }
+    
+    func testStringPartialExpression() throws {
+        let reExpr = 
+            Expression
+                .parse(try Lex.lex("asdf"))
+                .rewrite(.removeExtraneousConcat)
+        
+        let partial = reExpr.partial
+        
+        XCTAssert(partial.description == "(asdf|(asd|(as|a)))", "original: \(reExpr.description) partial: \(partial)")
     }
 }

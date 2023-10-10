@@ -80,6 +80,37 @@ indirect enum Expression: CustomStringConvertible {
         }
     }
     
+    // TODO
+    // Expression should be in a reduced form that's amenable to testing.
+    var partial: Expression {
+        switch self {
+        case .string(let string):
+            // e.g. "abc".partial -> ("abc"|"ab"|"a")
+            let partial =
+                string
+                    .split(separator: "")
+                    .map(String.init)
+                    .cumsum
+                    .reversed() // Necessary to ensure the longest possible substring is matched.
+                    .joined(separator: "|")
+
+            // Lex transformed string, pass as new expression.
+            let partialLex = try! Lex.lex(partial)
+            return Expression.parse(partialLex)
+            /*
+        case .quantifier(let `operator`, let expression):
+            <#code#>
+        case .union(let left, let right):
+            <#code#>
+        case .concat(let array):
+            <#code#>
+             */
+        default: break
+        }
+        
+        return self
+    }
+    
     // Can do polymorphism to have enum cases of defined transforms, use dot notation to advantage.
     func rewrite(_ rewriter: (Expression) -> Expression) -> Expression {
         return Expression.rewrite(self, rewriter: rewriter)
@@ -144,8 +175,9 @@ indirect enum Expression: CustomStringConvertible {
             while array.isEmpty == false {
                 if array.count >= 3, case .token(.union) = array[1] {
                     // Expr | Expr
-                    expressions.append(.union(left: parseTree(array[0]), right: parseTree(array[2])))
-                    array = Array(array[3...])
+                    expressions.append(.union(left: parseTree(array[0]), right: parseTree(.paren(Array(array[2...])))))
+                    break
+                    //array = Array(array[3...])
                 } else if array.count >= 2, case .token(let token) = array[1], case .quantifier(let quantifier) = token {
                     // (Expr)Quantifier e.g. (abc)*
                     expressions.append(.quantifier(operator: quantifier, parseTree(array[0])))
@@ -273,6 +305,7 @@ enum Lex {
                     let str = input[input.index(input.startIndex, offsetBy: startIndex)...]
                     tokens.append(.string(value: String(str)))
                     state = .none
+                    break
                 }
             }
                 
@@ -290,6 +323,9 @@ enum Lex {
             case "a"..."z", "A"..."Z", "0"..."9":
                 if case .string(_) = state {
                     break
+                }
+                if index == input.count-1 {
+                    tokens.append(.string(value: String(char)))
                 }
                 state = .string(startIndex: index)
             case "\\":
