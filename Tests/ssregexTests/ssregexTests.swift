@@ -90,4 +90,14 @@ final class ssregexTests: XCTestCase {
         
         XCTAssert(["a", "b", "c", #"\d"#, "x", "y", "z"] == values, "Values: \(values)")
     }
+    
+    func testRegexPhoneNumber() throws {
+        let reExpr =
+            Expression
+                .parse(try Lex.lex(#"\d\d\d-\d\d\d-\d\d\d\d"#))
+                .rewrite(.removeExtraneousConcat)
+        
+        XCTAssert(reExpr.description == #"\d\d\d-\d\d\d-\d\d\d\d"#)
+        // TODO: Implement partial
+    }
 }

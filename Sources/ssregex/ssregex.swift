@@ -384,8 +384,8 @@ enum Lex {
         var tokens: [Token] = []
         var state: State = .none
         
-        let alphanumeric = { (char: String) in
-            let regex = try? Regex(#"[a-zA-Z\d]"#)
+        let ascii = { (char: String) in
+            let regex = try? Regex(#"[a-zA-Z\d\-!*#$%&]"#)
             return (try? regex?.wholeMatch(in: char)?.isEmpty == false) ?? false
         }
         
@@ -396,7 +396,7 @@ enum Lex {
             let char = input[input.index(input.startIndex, offsetBy: index)..<input.index(input.startIndex, offsetBy: index+1)]
             
             if case let .string(startIndex) = state {
-                if alphanumeric(String(char)) == false {
+                if ascii(String(char)) == false {
                     let str = input[input.index(input.startIndex, offsetBy: startIndex)..<input.index(input.startIndex, offsetBy: index)]
                     tokens.append(.string(value: String(str)))
                     state = .none
@@ -419,7 +419,7 @@ enum Lex {
                 tokens.append(.quantifier(.zeroOrMore))
             case "?":
                 tokens.append(.quantifier(.zeroOrOne))
-            case "a"..."z", "A"..."Z", "0"..."9":
+            case _ where ascii(String(char)):
                 if case .string(_) = state {
                     break
                 }
