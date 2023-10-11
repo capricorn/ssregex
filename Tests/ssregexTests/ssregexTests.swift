@@ -88,6 +88,6 @@ final class ssregexTests: XCTestCase {
         
         let values: [String] = str.map { $0 }
         
-        XCTAssert(["abc", #"\d"#, "xyz"] == values, "Values: \(values)")
+        XCTAssert(["a", "b", "c", #"\d"#, "x", "y", "z"] == values, "Values: \(values)")
     }
 }

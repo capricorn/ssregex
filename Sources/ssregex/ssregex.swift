@@ -39,26 +39,55 @@ extension Array where Element == String {
 
 // TODO: **Implement pretty print**
 indirect enum Expression: CustomStringConvertible {
-    struct StringSequence: Collection {
+    struct StringSequence: Collection, CustomStringConvertible {
         subscript(position: Int) -> String {
-            switch tokens[position] {
-            case .string(let value):
-                value
-            case .specialChar(let special):
-                special.rawValue
-            default: ""
-            }
+            return characters[position]
         }
         
         let tokens: [Lex.Token]
+        let characters: [String]
+        
+        init(tokens: [Lex.Token]) {
+            self.tokens = tokens
+            self.characters =
+                tokens.map { (token: Lex.Token) -> [String] in
+                    switch token {
+                    case .string(let value):
+                        return value.split(separator: "").map(String.init)
+                    case .specialChar(let special):
+                        return [special.rawValue]
+                    default:
+                        return [""]
+                    }
+                }
+                .flatMap { $0 }
+        }
+        
+        /*
+        mutating lazy var characters: [String] = {
+            // Expan tokens to a stream of characters
+            tokens.map { (token: Lex.Token) -> [String] in
+                switch token {
+                case .string(let value):
+                    return value.split(separator: "").map(String.init)
+                case .specialChar(let special):
+                    return [special.rawValue]
+                default:
+                    return [""]
+                }
+            }
+            .flatMap { $0 }
+        }()
+         */
         
         struct StringIterator: IteratorProtocol {
             typealias Element = StringSequence.Element
             
-            let tokens: [Lex.Token]
+            let tokens: [String]
             private var index = 0
             
-            init(tokens: [Lex.Token]) {
+            init(tokens: [String]) {
+                // TODO: Explode these tokens
                 self.tokens = tokens
             }
             
@@ -67,16 +96,10 @@ indirect enum Expression: CustomStringConvertible {
                     return nil
                 }
                 
-                let result = switch tokens[index] {
-                case .string(let val):
-                    val
-                case .specialChar(let special):
-                    special.rawValue
-                default:
-                    ""
-                }
                 
+                let result = tokens[index]
                 index += 1
+                
                 return result
             }
             
@@ -90,8 +113,13 @@ indirect enum Expression: CustomStringConvertible {
             return 0
         }
         
+        // TODO: Needs to be a character count, not token count.
         var endIndex: Index {
-            return tokens.count
+            return characters.count
+        }
+        
+        var description: String {
+            self.joined(separator: "")
         }
         
         func index(after i: Index) -> Index {
@@ -99,11 +127,11 @@ indirect enum Expression: CustomStringConvertible {
         }
         
         func makeIterator() -> StringIterator {
-            return StringIterator(tokens: tokens)
+            return StringIterator(tokens: characters)
         }
     }
     
-    case string(String)
+    case string(StringSequence)
     case quantifier(operator: Lex.Token.Quantifier, Expression)
     case union(left: Expression, right: Expression)
     case concat([Expression])
@@ -152,8 +180,8 @@ indirect enum Expression: CustomStringConvertible {
             // e.g. "abc".partial -> ("abc"|"ab"|"a")
             let partial =
                 string
-                    .split(separator: "")
-                    .map(String.init)
+                    //.split(separator: "")
+                    .map({ $0 })
                     .cumsum
                     .reversed() // Necessary to ensure the longest possible substring is matched.
                     .joined(separator: "|")
@@ -229,10 +257,9 @@ indirect enum Expression: CustomStringConvertible {
             // The only tokens reachable here are primitives (leaves)
             switch token {
             case .string(let value):
-                return .string(value)
+                return .string(StringSequence(tokens: [.string(value: value) ]))
             case .specialChar(let special):
-                // TODO: Worth returning special? Can reasonably detect with leading '\'.
-                return .string(special.rawValue)
+                return .string(StringSequence(tokens: [.specialChar(special) ]))
             default:
                 assertionFailure("Cannot handle non-primitive token case: \(tree)")
                 break
@@ -285,7 +312,7 @@ indirect enum Expression: CustomStringConvertible {
     var description: String {
         switch self {
         case .string(let string):
-            return string
+            return string.description
         case .quantifier(let quantifier, let expression):
             return "(\(expression))\(quantifier.rawValue)"
         case .union(let left, let right):
