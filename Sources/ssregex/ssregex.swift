@@ -39,6 +39,70 @@ extension Array where Element == String {
 
 // TODO: **Implement pretty print**
 indirect enum Expression: CustomStringConvertible {
+    struct StringSequence: Collection {
+        subscript(position: Int) -> String {
+            switch tokens[position] {
+            case .string(let value):
+                value
+            case .specialChar(let special):
+                special.rawValue
+            default: ""
+            }
+        }
+        
+        let tokens: [Lex.Token]
+        
+        struct StringIterator: IteratorProtocol {
+            typealias Element = StringSequence.Element
+            
+            let tokens: [Lex.Token]
+            private var index = 0
+            
+            init(tokens: [Lex.Token]) {
+                self.tokens = tokens
+            }
+            
+            mutating func next() -> Expression.StringSequence.Element? {
+                guard index < tokens.count else {
+                    return nil
+                }
+                
+                let result = switch tokens[index] {
+                case .string(let val):
+                    val
+                case .specialChar(let special):
+                    special.rawValue
+                default:
+                    ""
+                }
+                
+                index += 1
+                return result
+            }
+            
+        }
+        
+        typealias Element = String
+        typealias Iterator = StringIterator
+        typealias Index = Int
+        
+        var startIndex: Index {
+            return 0
+        }
+        
+        var endIndex: Index {
+            return tokens.count
+        }
+        
+        func index(after i: Index) -> Index {
+            return i+1
+        }
+        
+        func makeIterator() -> StringIterator {
+            return StringIterator(tokens: tokens)
+        }
+    }
+    
     case string(String)
     case quantifier(operator: Lex.Token.Quantifier, Expression)
     case union(left: Expression, right: Expression)

@@ -81,4 +81,13 @@ final class ssregexTests: XCTestCase {
         let partial = reExpr.partial
         XCTAssert(partial.description == "((abc|xyz))*(((abc|(ab|a))|(xyz|(xy|x))))?", "original: \(reExpr.description) partial: \(partial)")
     }
+    
+    func testRegexStringIterator() throws {
+        let tokens: [Lex.Token] = [ .string(value: "abc"), .specialChar(.digit), .string(value: "xyz") ]
+        let str = Expression.StringSequence(tokens: tokens)
+        
+        let values: [String] = str.map { $0 }
+        
+        XCTAssert(["abc", #"\d"#, "xyz"] == values, "Values: \(values)")
+    }
 }
