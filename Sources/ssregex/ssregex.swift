@@ -38,6 +38,7 @@ extension Array where Element == String {
 }
 
 // TODO: **Implement pretty print**
+@available(macOS 13.0, *)
 indirect enum Expression: CustomStringConvertible {
     struct StringSequence: Collection, CustomStringConvertible {
         subscript(position: Int) -> String {
@@ -349,7 +350,7 @@ indirect enum Expression: CustomStringConvertible {
     }
 }
 
-
+@available(macOS 13.0, *)
 enum Lex {
     struct TokenError: Error {}
     
@@ -480,6 +481,7 @@ protocol Partial {
     var partial: String { get }
 }
 
+@available(macOS 13.0, *)
 enum Parser {
     // TODO: Return this from parenthesize
     indirect enum Paren {
