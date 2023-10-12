@@ -199,10 +199,17 @@ indirect enum Expression: CustomStringConvertible {
                 return .concat([self, .quantifier(operator: .zeroOrOne, .union(left: left.partial, right: right.partial))])
             default: break
             }
+        case .concat(let array):
+            assert(array.count > 1)
+            if array.count == 2 {
+                return .union(left: .concat([array[0], array[1].partial]), right: array[0].partial)
+            } else {
+                // Case where array.count > 2
+                return .union(left: .concat([array[0], .concat(Array(array[1...])).partial]), right: array[0].partial)
+                
+            }
         /*
         case .union(let left, let right):
-            <#code#>
-        case .concat(let array):
             <#code#>
              */
         default: break
