@@ -191,17 +191,7 @@ indirect enum Expression: CustomStringConvertible {
             return Expression.parse(partialLex)
         case .quantifier(let quantifier, let subexpr):
             // TODO: Assumption is * quantifier; handle other cases
-            switch subexpr {
-            case .string(_):
-                return .concat([self, .quantifier(operator: .zeroOrOne, subexpr.partial)])
-            case .union(let left, let right):
-                // (A|B)* -> (A|B)*(p(A)|p(B))?
-                return .concat([self, .quantifier(operator: .zeroOrOne, .union(left: left.partial, right: right.partial))])
-            case .concat(let array):
-                // P(E*) -> E*P(E)
-                return .concat([self, subexpr.partial])
-            default: break
-            }
+            return .concat([self, subexpr.partial])
         case .concat(let array):
             assert(array.count > 0)
             if array.count == 1 {

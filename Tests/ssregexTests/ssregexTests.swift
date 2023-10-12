@@ -69,7 +69,7 @@ final class ssregexTests: XCTestCase {
                 .rewrite(.removeExtraneousConcat)
         
         let partial = reExpr.partial
-        XCTAssert(partial.description == "(asdf)*((asdf|(asd|(as|a))))?", "original: \(reExpr.description) partial: \(partial)")
+        XCTAssert(partial.description == "(asdf)*(asdf|(asd|(as|a)))", "original: \(reExpr.description) partial: \(partial)")
     }
     
     func testUnionQuantifierPartialExpression() throws {
@@ -79,7 +79,7 @@ final class ssregexTests: XCTestCase {
                 .rewrite(.removeExtraneousConcat)
     
         let partial = reExpr.partial
-        XCTAssert(partial.description == "((abc|xyz))*(((abc|(ab|a))|(xyz|(xy|x))))?", "original: \(reExpr.description) partial: \(partial)")
+        XCTAssert(partial.description == "((abc|xyz))*((abc|(ab|a))|(xyz|(xy|x)))", "original: \(reExpr.description) partial: \(partial)")
     }
     
     func testRegexStringIterator() throws {
@@ -108,7 +108,7 @@ final class ssregexTests: XCTestCase {
         
         let partial = re.partial
         
-        XCTAssert(partial.description == #"((abc)*((abc|(ab|a)))?|(xyz|(xy|x)))"#, "reg: \(re) partial: \(partial)")
+        XCTAssert(partial.description == #"((abc)*(abc|(ab|a))|(xyz|(xy|x)))"#, "reg: \(re) partial: \(partial)")
     }
     
     func testConcatQuantifierPartial() throws {
