@@ -131,4 +131,13 @@ final class ssregexTests: XCTestCase {
         
         XCTAssert(partial.description == #"((abc|(ab|a)))?"#, "reg: \(re) partial: \(partial)")
     }
+    
+    func testRewritePlusQuantifier() throws {
+        let re =
+            Expression.parse(try Lex.lex(#"(abc)+"#))
+            .rewrite(.reducePlusQuantifier)
+        
+        
+        XCTAssert(re.description == #"abc(abc)*"#, "reg: \(re)")
+    }
 }

@@ -139,6 +139,15 @@ indirect enum Expression: CustomStringConvertible {
     enum Rewrite {
         case removeExtraneousConcat
         case collapseQuantifiers
+        case reducePlusQuantifier
+        
+        static func reducePlusQuantifier(_ expr: Expression) -> Expression {
+            if case .quantifier(let quantifier, let subexpr) = expr, quantifier == .oneOrMore {
+                return .concat([subexpr, .quantifier(operator: .zeroOrMore, subexpr)])
+            }
+            
+            return expr
+        }
         
         static func removeExtraneousConcat(_ expr: Expression) -> Expression {
             switch expr {
@@ -227,6 +236,8 @@ indirect enum Expression: CustomStringConvertible {
             Expression.Rewrite.removeExtraneousConcat
         case .collapseQuantifiers:
             Expression.Rewrite.collapseQuantifiers
+        case .reducePlusQuantifier:
+            Expression.Rewrite.reducePlusQuantifier
         }
         
         return rewrite(transform)
