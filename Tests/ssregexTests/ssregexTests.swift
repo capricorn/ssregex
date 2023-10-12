@@ -92,12 +92,12 @@ final class ssregexTests: XCTestCase {
     }
     
     func testRegexPhoneNumber() throws {
-        let reExpr =
+        let reExpr2 =
             Expression
                 .parse(try Lex.lex(#"\d\d\d-\d\d\d-\d\d\d\d"#))
                 .rewrite(.removeExtraneousConcat)
         
-        XCTAssert(reExpr.description == #"\d\d\d-\d\d\d-\d\d\d\d"#)
-        // TODO: Implement partial
+        let partial = reExpr2.partial
+        XCTAssert(partial.description == #"(\d(\d(\d(-(\d(\d(\d(-(\d(\d(\d\d|\d)|\d)|\d)|-)|\d)|\d)|\d)|-)|\d)|\d)|\d)"#, "regular: \(reExpr2) partial: \(partial)")
     }
 }
