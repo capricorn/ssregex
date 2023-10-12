@@ -121,4 +121,14 @@ final class ssregexTests: XCTestCase {
         
         XCTAssert(partial.description == #"(abcxyz)*(abc(xyz|(xy|x))|(abc|(ab|a)))"#, "reg: \(re) partial: \(partial)")
     }
+    
+    func testStringZeroOneQuantifierPartial() throws {
+        let re =
+            Expression.parse(try Lex.lex(#"(abc)?"#))
+            .rewrite(.removeExtraneousConcat)
+        
+        let partial = re.partial
+        
+        XCTAssert(partial.description == #"((abc|(ab|a)))?"#, "reg: \(re) partial: \(partial)")
+    }
 }

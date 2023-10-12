@@ -190,6 +190,11 @@ indirect enum Expression: CustomStringConvertible {
             let partialLex = try! Lex.lex(partial)
             return Expression.parse(partialLex)
         case .quantifier(let quantifier, let subexpr):
+            switch quantifier {
+            case .zeroOrOne:
+                return .quantifier(operator: .zeroOrOne, subexpr.partial)
+            default: break
+            }
             // TODO: Assumption is * quantifier; handle other cases
             return .concat([self, subexpr.partial])
         case .concat(let array):
