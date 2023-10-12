@@ -100,4 +100,14 @@ final class ssregexTests: XCTestCase {
         let partial = reExpr2.partial
         XCTAssert(partial.description == #"(\d(\d(\d(-(\d(\d(\d(-(\d(\d(\d\d|\d)|\d)|\d)|-)|\d)|\d)|\d)|-)|\d)|\d)|\d)"#, "regular: \(reExpr2) partial: \(partial)")
     }
+    
+    func testUnionPartial() throws {
+        let re =
+            Expression.parse(try Lex.lex(#"(abc)*|(xyz)"#))
+            .rewrite(.removeExtraneousConcat)
+        
+        let partial = re.partial
+        
+        XCTAssert(partial.description == #"((abc)*((abc|(ab|a)))?|(xyz|(xy|x)))"#, "reg: \(re) partial: \(partial)")
+    }
 }

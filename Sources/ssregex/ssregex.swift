@@ -200,18 +200,18 @@ indirect enum Expression: CustomStringConvertible {
             default: break
             }
         case .concat(let array):
-            assert(array.count > 1)
-            if array.count == 2 {
+            assert(array.count > 0)
+            if array.count == 1 {
+                return array[0].partial
+            } else if array.count == 2 {
                 return .union(left: .concat([array[0], array[1].partial]), right: array[0].partial)
             } else {
                 // Case where array.count > 2
                 return .union(left: .concat([array[0], .concat(Array(array[1...])).partial]), right: array[0].partial)
                 
             }
-        /*
         case .union(let left, let right):
-            <#code#>
-             */
+            return .union(left: left.partial, right: right.partial)
         default: break
         }
         
@@ -279,11 +279,21 @@ indirect enum Expression: CustomStringConvertible {
             var array = array
             
             while array.isEmpty == false {
-                if array.count >= 3, case .token(.union) = array[1] {
-                    // Expr | Expr
-                    expressions.append(.union(left: parseTree(array[0]), right: parseTree(.paren(Array(array[2...])))))
-                    break
+                if array.count >= 3 {
+                    if case .token(.union) = array[1] {
+                        // Expr | Expr
+                        expressions.append(.union(left: parseTree(array[0]), right: parseTree(.paren(Array(array[2...])))))
+                        break
+                    } else if case .token(.quantifier(let quantifier)) = array[1], case .token(.union) = array[2] {
+                        // Expr Quantifier | Expr
+                        expressions.append(.union(left: .quantifier(operator: quantifier, parseTree(array[0])), right: parseTree(.paren(Array(array[3...]))) ))
+                        break
+                    }
+                }
                     //array = Array(array[3...])
+                if case .token(.union) = array[0] {
+                    expressions.append(.union(left: expressions.last!, right: parseTree(.paren(Array(array[1...])))))
+                    break
                 } else if array.count >= 2, case .token(let token) = array[1], case .quantifier(let quantifier) = token {
                     // (Expr)Quantifier e.g. (abc)*
                     expressions.append(.quantifier(operator: quantifier, parseTree(array[0])))
