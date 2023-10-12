@@ -197,6 +197,9 @@ indirect enum Expression: CustomStringConvertible {
             case .union(let left, let right):
                 // (A|B)* -> (A|B)*(p(A)|p(B))?
                 return .concat([self, .quantifier(operator: .zeroOrOne, .union(left: left.partial, right: right.partial))])
+            case .concat(let array):
+                // P(E*) -> E*P(E)
+                return .concat([self, subexpr.partial])
             default: break
             }
         case .concat(let array):
