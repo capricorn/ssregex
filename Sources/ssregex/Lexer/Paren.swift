@@ -8,7 +8,7 @@
 import Foundation
 
 @available(macOS 13.0, *)
-extension Parser {
+extension Lex {
     // TODO: Return this from parenthesize
     indirect enum Paren {
         case token(Lex.Token)

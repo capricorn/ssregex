@@ -60,7 +60,7 @@ indirect enum Expression: CustomStringConvertible {
     
 
     
-    private static func parseTree(_ tree: Parser.Paren) -> Expression {
+    private static func parseTree(_ tree: Lex.Paren) -> Expression {
         var expressions: [Expression] = []
         
         // TODO: Implement conversion of Lex.Token -> Expression (computed var)
@@ -115,7 +115,7 @@ indirect enum Expression: CustomStringConvertible {
     }
     
     static func parse(_ tokens: [Lex.Token]) -> Expression {
-        let tree = Parser.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
+        let tree = Lex.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
         print("Lex tree: \(tree)")
         return parseTree(tree)
     }
