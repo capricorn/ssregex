@@ -13,6 +13,7 @@ public enum Lex {
     
     private enum State {
         case string(startIndex: Int)
+        case exactQuantifier(startIndex: Int)
         case none
     }
     
@@ -48,9 +49,18 @@ public enum Lex {
                 
             switch char {
             case "{":
-                tokens.append(.brace(.left))
+                // (Presumably the match count begins at this index+1
+                state = .exactQuantifier(startIndex: index+1)
             case "}":
-                tokens.append(.brace(.right))
+                if case .exactQuantifier(let startIndex) = state {
+                    let start = input.index(input.startIndex, offsetBy: startIndex)
+                    let end = input.index(input.startIndex, offsetBy: index)
+                    let matchCount = Int(input[start..<end])!
+                    
+                    tokens.append(.quantifier(.exact(k: matchCount)))
+                }
+                // TODO
+                state = .none
             case "(":
                 tokens.append(.paren(type: .left, index: index))
             case ")":
@@ -64,7 +74,10 @@ public enum Lex {
             case _ where ascii(String(char)):
                 if case .string(_) = state {
                     break
+                } else if case .exactQuantifier(_) = state {
+                    break
                 }
+                
                 if index == input.count-1 {
                     tokens.append(.string(value: String(char)))
                 }

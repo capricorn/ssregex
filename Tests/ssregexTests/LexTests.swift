@@ -22,6 +22,6 @@ final class LexTests: XCTestCase {
         let str = "{100}"
         let lex = try Lex.lex(str)
         
-        XCTAssert(lex == [.brace(.left), .string(value: "100"), .brace(.right) ])
+        XCTAssert(lex == [.quantifier(.exact(k: 100))], "\(lex)")
     }
 }

@@ -61,7 +61,7 @@ public indirect enum Expression: CustomStringConvertible {
         case .string(let string):
             return string.description
         case .quantifier(let quantifier, let expression):
-            return "(\(expression))\(quantifier.rawValue)"
+            return "(\(expression))\(quantifier.regex)"
         case .union(let left, let right):
             return "(\(left)|\(right))"
         case .concat(let array):
