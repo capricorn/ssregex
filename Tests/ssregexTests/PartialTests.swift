@@ -92,4 +92,14 @@ final class PartialTests: XCTestCase {
         
         XCTAssert(partial.description == #"((abc|(ab|a)))?"#, "reg: \(re) partial: \(partial)")
     }
+    
+    func testExactQuantifierPartial() throws {
+        let re =
+            Parser
+                .parse(try Lex.lex(#"(abc){2}"#))
+                .rewrite(.removeExtraneousConcat)
+        
+        let partial = re.partial
+        XCTAssert(partial.description == #"(abc(abc|(ab|a))|(abc|(ab|a)))"#, "reg: \(re) partial: \(partial)")
+    }
 }

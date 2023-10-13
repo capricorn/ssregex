@@ -15,6 +15,11 @@ public indirect enum Expression: CustomStringConvertible {
     case concat([Expression])
     
     public var partial: Expression {
+        self.rewrite(.expandExactQuantifier)
+            .partialRec
+    }
+    
+    private var partialRec: Expression {
         switch self {
         case .string(let string):
             // e.g. "abc".partial -> ("abc"|"ab"|"a")
