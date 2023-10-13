@@ -14,9 +14,7 @@ public indirect enum Expression: CustomStringConvertible {
     case union(left: Expression, right: Expression)
     case concat([Expression])
     
-    // TODO
-    // Expression should be in a reduced form that's amenable to testing.
-    var partial: Expression {
+    public var partial: Expression {
         switch self {
         case .string(let string):
             // e.g. "abc".partial -> ("abc"|"ab"|"a")

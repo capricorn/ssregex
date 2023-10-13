@@ -72,7 +72,6 @@ public enum Parser {
     
     public static func parse(_ tokens: [Lex.Token]) -> Expression {
         let tree = Lex.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
-        print("Lex tree: \(tree)")
         return parseTree(tree)
     }
     
