@@ -13,6 +13,15 @@ extension Expression {
         case removeExtraneousConcat
         case collapseQuantifiers
         case reducePlusQuantifier
+        case expandExactQuantifier
+        
+        public static func expandExactQuantifier(_ expr: Expression) -> Expression {
+            if case .quantifier(let quantifier, let subexpr) = expr, case .exact(let k) = quantifier {
+                return .concat((0..<k).map({_ in subexpr}))
+            }
+            
+            return expr
+        }
         
         public static func reducePlusQuantifier(_ expr: Expression) -> Expression {
             if case .quantifier(let quantifier, let subexpr) = expr, quantifier == .oneOrMore {
@@ -66,6 +75,8 @@ extension Expression {
             Expression.Rewrite.collapseQuantifiers
         case .reducePlusQuantifier:
             Expression.Rewrite.reducePlusQuantifier
+        case .expandExactQuantifier:
+            Expression.Rewrite.expandExactQuantifier
         }
         
         return rewrite(transform)

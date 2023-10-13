@@ -46,4 +46,13 @@ final class RewriteTests: XCTestCase {
         
         XCTAssert(re.description == #"abc(abc)*"#, "reg: \(re)")
     }
+    
+    func testRewriteExpandExactQuantifier() throws {
+        let re =
+            Parser
+                .parse(try Lex.lex(#"(abc|xyz){3}"#))
+                .rewrite(.expandExactQuantifier)
+        
+        XCTAssert(re.description == #"(abc|xyz)(abc|xyz)(abc|xyz)"#, "reg: \(re)")
+    }
 }
