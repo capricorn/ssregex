@@ -4,14 +4,14 @@ import XCTest
 final class ssregexTests: XCTestCase {
     func testStringQuantifierParse() throws {
         let lex = try Lex.lex(#"(abc)*"#)
-        let ast = Expression.parse(lex)
+        let ast = Parser.parse(lex)
         
         XCTAssert(ast.description == #"(abc)*"#, ast.description)
     }
     
     func testUnionParse() throws {
         let lex = try Lex.lex(#"abc|xyz|ijk"#)
-        let ast = Expression
+        let ast = Parser
             .parse(lex)
         
         XCTAssert(ast.description == #"(abc|(xyz|ijk))"#, ast.description)
@@ -19,21 +19,21 @@ final class ssregexTests: XCTestCase {
     
     func testUnionQuantifierParse() throws {
         let lex = try Lex.lex(#"(abc|xyz)*"#)
-        let ast = Expression.parse(lex)
+        let ast = Parser.parse(lex)
         
         XCTAssert(ast.description == #"((abc|xyz))*"#, ast.description)
     }
     
     func testStackedQuantifierParse() throws {
         let lex = try Lex.lex(#"((abc)*)*"#)
-        let ast = Expression.parse(lex)
+        let ast = Parser.parse(lex)
         
         XCTAssert(ast.description == #"((abc)*)*"#, ast.description)
     }
     
     func testTreeRewriteExtraneousConcat() throws {
         let lex = try Lex.lex(#"((abc)*)*"#)
-        let ast = Expression.parse(lex)
+        let ast = Parser.parse(lex)
         
         let astRewrite = ast.rewrite(.removeExtraneousConcat)
         
@@ -43,7 +43,7 @@ final class ssregexTests: XCTestCase {
     
     func testTreeRewriteCollapseQuantifier() throws {
         let lex = try Lex.lex(#"((abc)*)*"#)
-        let ast = Expression.parse(lex)
+        let ast = Parser.parse(lex)
         let astRewrite = ast
             .rewrite(.removeExtraneousConcat)
             .rewrite(.collapseQuantifiers)
@@ -53,7 +53,7 @@ final class ssregexTests: XCTestCase {
     
     func testStringPartialExpression() throws {
         let reExpr = 
-            Expression
+            Parser
                 .parse(try Lex.lex("asdf"))
                 .rewrite(.removeExtraneousConcat)
         
@@ -64,7 +64,7 @@ final class ssregexTests: XCTestCase {
     
     func testStringQuantifierPartialExpression() throws {
         let reExpr =
-            Expression
+            Parser
                 .parse(try Lex.lex("(asdf)*"))
                 .rewrite(.removeExtraneousConcat)
         
@@ -74,7 +74,7 @@ final class ssregexTests: XCTestCase {
     
     func testUnionQuantifierPartialExpression() throws {
         let reExpr =
-            Expression
+            Parser
                 .parse(try Lex.lex("(abc|xyz)*"))
                 .rewrite(.removeExtraneousConcat)
     
@@ -93,7 +93,7 @@ final class ssregexTests: XCTestCase {
     
     func testRegexPhoneNumber() throws {
         let reExpr2 =
-            Expression
+            Parser
                 .parse(try Lex.lex(#"\d\d\d-\d\d\d-\d\d\d\d"#))
                 .rewrite(.removeExtraneousConcat)
         
@@ -103,8 +103,9 @@ final class ssregexTests: XCTestCase {
     
     func testUnionPartial() throws {
         let re =
-            Expression.parse(try Lex.lex(#"(abc)*|(xyz)"#))
-            .rewrite(.removeExtraneousConcat)
+            Parser
+                .parse(try Lex.lex(#"(abc)*|(xyz)"#))
+                .rewrite(.removeExtraneousConcat)
         
         let partial = re.partial
         
@@ -113,8 +114,9 @@ final class ssregexTests: XCTestCase {
     
     func testConcatQuantifierPartial() throws {
         let re =
-            Expression.parse(try Lex.lex(#"((abc)(xyz))*"#))
-            .rewrite(.removeExtraneousConcat)
+            Parser
+                .parse(try Lex.lex(#"((abc)(xyz))*"#))
+                .rewrite(.removeExtraneousConcat)
         
         let partial = re.partial
         print(partial)
@@ -124,8 +126,9 @@ final class ssregexTests: XCTestCase {
     
     func testStringZeroOneQuantifierPartial() throws {
         let re =
-            Expression.parse(try Lex.lex(#"(abc)?"#))
-            .rewrite(.removeExtraneousConcat)
+            Parser
+                .parse(try Lex.lex(#"(abc)?"#))
+                .rewrite(.removeExtraneousConcat)
         
         let partial = re.partial
         
@@ -134,9 +137,9 @@ final class ssregexTests: XCTestCase {
     
     func testRewritePlusQuantifier() throws {
         let re =
-            Expression.parse(try Lex.lex(#"(abc)+"#))
-            .rewrite(.reducePlusQuantifier)
-        
+            Parser
+                .parse(try Lex.lex(#"(abc)+"#))
+                .rewrite(.reducePlusQuantifier)
         
         XCTAssert(re.description == #"abc(abc)*"#, "reg: \(re)")
     }
