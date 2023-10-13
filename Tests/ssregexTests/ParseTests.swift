@@ -46,5 +46,4 @@ final class ParseTests: XCTestCase {
         
         XCTAssert(ast.description == #"((abc)*)*"#, ast.description)
     }
- 
 }

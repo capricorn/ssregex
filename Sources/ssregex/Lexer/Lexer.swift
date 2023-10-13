@@ -47,6 +47,10 @@ public enum Lex {
             }
                 
             switch char {
+            case "{":
+                tokens.append(.brace(.left))
+            case "}":
+                tokens.append(.brace(.right))
             case "(":
                 tokens.append(.paren(type: .left, index: index))
             case ")":

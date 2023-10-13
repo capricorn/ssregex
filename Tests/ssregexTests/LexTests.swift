@@ -17,4 +17,11 @@ final class LexTests: XCTestCase {
     override func tearDownWithError() throws {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
+    
+    func testLexCurlyBrace() throws {
+        let str = "{100}"
+        let lex = try Lex.lex(str)
+        
+        XCTAssert(lex == [.brace(.left), .string(value: "100"), .brace(.right) ])
+    }
 }
