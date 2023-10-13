@@ -9,8 +9,8 @@ import Foundation
 
 @available(macOS 13.0, *)
 extension Lex {
-    enum Token {
-        enum Quantifier: String {
+    public enum Token {
+        public enum Quantifier: String {
             case zeroOrMore = "*"
             case zeroOrOne = "?"  // ?
             case oneOrMore = "+" // +
@@ -18,12 +18,12 @@ extension Lex {
             case exact = "{}"
         }
         
-        enum Paren {
+        public enum Paren {
             case left
             case right
         }
         
-        enum Special: String {
+        public enum Special: String {
             case digit = #"\d"#
             case space = #"\s"#
         }

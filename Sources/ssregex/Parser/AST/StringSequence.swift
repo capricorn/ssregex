@@ -9,8 +9,8 @@ import Foundation
 
 @available(macOS 13.0, *)
 extension Expression {
-    struct StringSequence: Collection, CustomStringConvertible {
-        subscript(position: Int) -> String {
+    public struct StringSequence: Collection, CustomStringConvertible {
+        public subscript(position: Int) -> String {
             return characters[position]
         }
         
@@ -33,8 +33,8 @@ extension Expression {
             .flatMap { $0 }
         }
         
-        struct StringIterator: IteratorProtocol {
-            typealias Element = StringSequence.Element
+        public struct StringIterator: IteratorProtocol {
+            public typealias Element = StringSequence.Element
             
             let tokens: [String]
             private var index = 0
@@ -44,7 +44,7 @@ extension Expression {
                 self.tokens = tokens
             }
             
-            mutating func next() -> Expression.StringSequence.Element? {
+            public mutating func next() -> Expression.StringSequence.Element? {
                 guard index < tokens.count else {
                     return nil
                 }
@@ -58,28 +58,28 @@ extension Expression {
             
         }
         
-        typealias Element = String
-        typealias Iterator = StringIterator
-        typealias Index = Int
+        public typealias Element = String
+        public typealias Iterator = StringIterator
+        public typealias Index = Int
         
-        var startIndex: Index {
+        public var startIndex: Index {
             return 0
         }
         
         // TODO: Needs to be a character count, not token count.
-        var endIndex: Index {
+        public var endIndex: Index {
             return characters.count
         }
         
-        var description: String {
+        public var description: String {
             self.joined(separator: "")
         }
         
-        func index(after i: Index) -> Index {
+        public func index(after i: Index) -> Index {
             return i+1
         }
         
-        func makeIterator() -> StringIterator {
+        public func makeIterator() -> StringIterator {
             return StringIterator(tokens: characters)
         }
     }

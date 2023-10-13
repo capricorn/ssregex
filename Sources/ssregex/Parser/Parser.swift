@@ -8,7 +8,7 @@
 import Foundation
 
 @available(macOS 13.0, *)
-enum Parser {
+public enum Parser {
     private static func parseTree(_ tree: Lex.Paren) -> Expression {
         var expressions: [Expression] = []
         
@@ -63,7 +63,7 @@ enum Parser {
         return .concat(expressions)
     }
     
-    static func parse(_ tokens: [Lex.Token]) -> Expression {
+    public static func parse(_ tokens: [Lex.Token]) -> Expression {
         let tree = Lex.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
         print("Lex tree: \(tree)")
         return parseTree(tree)

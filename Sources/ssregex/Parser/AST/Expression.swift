@@ -8,7 +8,7 @@
 import Foundation
 
 @available(macOS 13.0, *)
-indirect enum Expression: CustomStringConvertible {
+public indirect enum Expression: CustomStringConvertible {
     case string(StringSequence)
     case quantifier(operator: Lex.Token.Quantifier, Expression)
     case union(left: Expression, right: Expression)
@@ -60,7 +60,7 @@ indirect enum Expression: CustomStringConvertible {
     
 
     
-    var description: String {
+    public var description: String {
         switch self {
         case .string(let string):
             return string.description

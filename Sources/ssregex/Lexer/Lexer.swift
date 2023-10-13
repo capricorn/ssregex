@@ -8,7 +8,7 @@
 import Foundation
 
 @available(macOS 13.0, *)
-enum Lex {
+public enum Lex {
     struct TokenError: Error {}
     
     private enum State {
