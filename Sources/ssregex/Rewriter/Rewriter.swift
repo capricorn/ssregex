@@ -9,12 +9,12 @@ import Foundation
 
 @available(macOS 13.0, *)
 extension Expression {
-    enum Rewrite {
+    public enum Rewrite {
         case removeExtraneousConcat
         case collapseQuantifiers
         case reducePlusQuantifier
         
-        static func reducePlusQuantifier(_ expr: Expression) -> Expression {
+        public static func reducePlusQuantifier(_ expr: Expression) -> Expression {
             if case .quantifier(let quantifier, let subexpr) = expr, quantifier == .oneOrMore {
                 return .concat([subexpr, .quantifier(operator: .zeroOrMore, subexpr)])
             }
@@ -22,7 +22,7 @@ extension Expression {
             return expr
         }
         
-        static func removeExtraneousConcat(_ expr: Expression) -> Expression {
+        public static func removeExtraneousConcat(_ expr: Expression) -> Expression {
             switch expr {
             case .concat(let array):
                 if array.count == 1 {
@@ -35,7 +35,7 @@ extension Expression {
             return expr
         }
         
-        static func collapseQuantifiers(_ expr: Expression) -> Expression {
+        public static func collapseQuantifiers(_ expr: Expression) -> Expression {
             switch expr {
             case .quantifier(let quantifier, let subexpr):
                 switch subexpr {
@@ -54,11 +54,11 @@ extension Expression {
         }
     }
     
-    func rewrite(_ rewriter: (Expression) -> Expression) -> Expression {
+    public func rewrite(_ rewriter: (Expression) -> Expression) -> Expression {
         return Expression.rewrite(self, rewriter: rewriter)
     }
     
-    func rewrite(_ rewriter: Rewrite) -> Expression {
+    public func rewrite(_ rewriter: Rewrite) -> Expression {
         let transform: (Expression) -> Expression = switch rewriter {
         case .removeExtraneousConcat:
             Expression.Rewrite.removeExtraneousConcat
@@ -71,7 +71,7 @@ extension Expression {
         return rewrite(transform)
     }
     
-    static func rewrite(_ expr: Expression, rewriter: (Expression) -> Expression) -> Expression {
+    public static func rewrite(_ expr: Expression, rewriter: (Expression) -> Expression) -> Expression {
         // Idea is: rewrite will return the transformed version of the node
         // Problem is: if rewriter is a no-op, then what
         let transformedExpr = rewriter(expr)

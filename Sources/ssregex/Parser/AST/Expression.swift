@@ -58,8 +58,6 @@ public indirect enum Expression: CustomStringConvertible {
         return self
     }
     
-
-    
     public var description: String {
         switch self {
         case .string(let string):
