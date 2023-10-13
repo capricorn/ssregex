@@ -63,6 +63,13 @@ public enum Parser {
         return .concat(expressions)
     }
     
+    public static func parse(_ regex: String) throws -> Expression {
+        let lex = try Lex.lex(regex)
+        let parenTree = Lex.Paren.parenthesize(lex)
+        
+        return parseTree(parenTree)
+    }
+    
     public static func parse(_ tokens: [Lex.Token]) -> Expression {
         let tree = Lex.Paren.parenthesize(tokens) //Parser.parenthesize(tokens).parens
         print("Lex tree: \(tree)")
