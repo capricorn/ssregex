@@ -41,7 +41,7 @@ public indirect enum Expression: CustomStringConvertible {
             default: break
             }
             // TODO: Assumption is * quantifier; handle other cases
-            return .concat([self, subexpr.partial])
+            return .concat([self, .quantifier(operator: .zeroOrOne, subexpr.partial) ])
         case .concat(let array):
             assert(array.count > 0)
             if array.count == 1 {
