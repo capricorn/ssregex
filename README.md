@@ -4,6 +4,8 @@
 a partial match mode will also match on any substring of a regular regex match. For instance,
 the partial match of `abc` will match on any of the substrings `a`, `ab`, or `abc`.
 
+See [this pdf](https://github.com/capricorn/ssregex-tex/blob/master/writeup.pdf) for an explanation of how the partial match rewriter works.
+
 ## Use
 
 ```swift
