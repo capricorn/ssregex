@@ -11,3 +11,14 @@ let partial = try Parser.parse("abc").partial
 
 let regex = try NSRegularExpression(partial)
 ```
+
+## Current support
+
+The following structures can be transformed to a partial match (where `E` is an expression):
+
+- Ascii characters
+- `EE`
+- `E|E`
+- `E*`
+- `E?`
+- `E{k}`
