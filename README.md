@@ -9,7 +9,7 @@ See [this pdf](https://github.com/capricorn/ssregex-tex/blob/master/writeup.pdf)
 ## Use
 
 ```swift
-let partial = try Parser.parse("abc").partial
+let partial = try Parser.parse("abc").partial   // /abc/ -> /(abc|ab|a)/
 
 let regex = try NSRegularExpression(partial)
 ```
