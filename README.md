@@ -6,6 +6,8 @@ the partial match of `abc` will match on any of the substrings `a`, `ab`, or `ab
 
 See [this pdf](https://github.com/capricorn/ssregex-tex/blob/master/writeup.pdf) for an explanation of how the partial match rewriter works.
 
+For partial rewrite examples, see [these tests](https://github.com/capricorn/ssregex/blob/master/Tests/ssregexTests/PartialTests.swift).
+
 ## Use
 
 ```swift
